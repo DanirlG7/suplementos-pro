@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SUPLEMENTOS PRO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Anton&family=Rajdhani:wght@700&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --cor-principal: #ff0000;
+      --cor-destaque: #ffd700;
+      --cor-texto: #ffffff;
+    }
+    body { background: #111; color: #fff; font-family: 'Rajdhani', sans-serif; }
+    .navbar { background: #000 !important; border-bottom: 4px solid var(--cor-principal); }
+    .navbar-brand { font-family: 'Bebas Neue'; font-size: 2.8rem; color: var(--cor-destaque) !important; text-shadow: 3px 3px 0 #000; }
+    .btn-login, .btn-cart { font-size: 1.2rem; padding: 8px 20px; border-radius: 50px; }
+    .btn-login { background: var(--cor-principal); border: 3px solid var(--cor-destaque); color: white; }
+    .btn-cart { background: #333; color: var(--cor-destaque); border: 3px solid var(--cor-principal); }
+    .hero { background: url('https://images.unsplash.com/photo-1552674608-e6c9261b7e53?w=1920') center/cover; height: 80vh; display: flex; align-items: center; text-align: center; position: relative; }
+    .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); }
+    .hero h1 { font-family: 'Anton'; font-size: 7rem; color: var(--cor-destaque); text-shadow: 5px 5px 0 #000; }
+    .btn-comprar-agora { background: var(--cor-principal); color: white; font-size: 2.5rem; padding: 25px 60px; border-radius: 50px; border: 5px solid var(--cor-destaque); font-family: 'Anton'; }
+    .section-title { font-family: 'Anton'; font-size: 5rem; color: var(--cor-destaque); text-shadow: 3px 3px 0 #000; text-align: center; margin: 60px 0; }
+    .product-name { font-family: 'Bebas Neue'; font-size: 2rem !important; color: #FFD700 !important; text-shadow: 2px 2px 0 #000; }
+    .product-price { font-size: 2.5rem !important; color: #00ff00 !important; text-shadow: 2px 2px 0 #000; }
+    .btn-add-cart { background: #0066ff; color: white; font-weight: 900; border-radius: 50px; padding: 15px 40px; font-size: 1.4rem; width: 100%; }
+    .btn-add-cart:hover { background: var(--cor-destaque); color: black; }
+    .badge-cart { animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+    .form-control { background: #333; color: white; border: 1px solid #555; }
+    .form-control:focus { background: #444; border-color: var(--cor-destaque); box-shadow: 0 0 0 0.2rem rgba(255,215,0,.25); }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="#">SUPLEMENTOS PRO</a>
+      <div class="ms-auto d-flex gap-2">
+        <button class="btn btn-login" data-bs-toggle="modal" data-bs-target="#authModal">LOGIN</button>
+        <button class="btn btn-cart position-relative" data-bs-toggle="modal" data-bs-target="#cartModal">
+          CARRINHO
+          <span id="cartCount" class="badge bg-danger position-absolute top-0 start-100 translate-middle badge-cart">0</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container position-relative">
+      <h1>GANHE MÚSCULO JÁ!</h1>
+      <p>OS MELHORES SUPLEMENTOS DO BRASIL</p>
+      <button class="btn-comprar-agora" onclick="scrollToProducts()">COMPRAR AGORA!</button>
+    </div>
+  </section>
+
+  <!-- PRODUTOS -->
+  <section class="py-5">
+    <div class="container">
+      <h2 class="section-title">++ PRODUTOS EM DESTAQUE ++</h2>
+      <div class="row g-4" id="productsRow"></div>
+    </div>
+  </section>
+
+  <!-- MODAL LOGIN/CADASTRO -->
+  <div class="modal fade" id="authModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-white border-danger">
+        <div class="modal-header bg-danger">
+          <h5 class="modal-title" id="modalTitle">LOGIN</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="authForm">
+            <div class="mb-3 d-none" id="nameField">
+              <label class="form-label">Nome Completo</label>
+              <input type="text" class="form-control" id="name">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Senha</label>
+              <input type="password" class="form-control" id="password" required>
+            </div>
+            <button type="submit" class="btn btn-success w-100" id="submitBtn">ENTRAR</button>
+          </form>
+          <div class="text-center mt-3">
+            <small id="toggleText">Não tem conta? <a href="#" id="toggleLink" class="text-warning">Cadastre-se</a></small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CARRINHO -->
+  <div class="modal fade" id="cartModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content bg-dark text-white border-danger">
+        <div class="modal-header bg-danger">
+          <h5 class="modal-title">SEU CARRINHO</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="cartItems">
+          <p class="text-center">Carrinho vazio.</p>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <h4>Total: R$ <span id="cartTotal">0.00</span></h4>
+          <button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#checkoutModal">FINALIZAR COMPRA</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL FINALIZAR COMPRA -->
+  <div class="modal fade" id="checkoutModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content bg-dark text-white border-success">
+        <div class="modal-header bg-success">
+          <h5 class="modal-title">FINALIZAR PEDIDO</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="checkoutForm">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Nome Completo *</label>
+                <input type="text" class="form-control" id="fullName" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">CPF *</label>
+                <input type="text" class="form-control" id="cpf" placeholder="000.000.000-00" required>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Data de Nascimento *</label>
+                <input type="date" class="form-control" id="birthDate" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Telefone *</label>
+                <input type="tel" class="form-control" id="phone" placeholder="(00) 00000-0000" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Endereço Completo *</label>
+              <input type="text" class="form-control" id="address" placeholder="Rua, número, bairro" required>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Cidade *</label>
+                <input type="text" class="form-control" id="city" required>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Estado *</label>
+                <select class="form-control" id="state" required>
+                  <option value="">Selecione</option>
+                  <option>SP</option><option>RJ</option><option>MG</option><option>RS</option>
+                  <!-- Adicione mais -->
+                </select>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">CEP *</label>
+                <input type="text" class="form-control" id="cep" placeholder="00000-000" required>
+              </div>
+            </div>
+            <hr>
+            <h5>Itens do Pedido</h5>
+            <div id="checkoutItems"></div>
+            <hr>
+            <h4 class="text-end">Total: R$ <span id="checkoutTotal">0.00</span></h4>
+            <button type="submit" class="btn btn-success btn-lg w-100 mt-3">CONFIRMAR PEDIDO</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_URL = 'http://localhost:8000';
+    let isLogin = true;
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    // CARRINHO
+    function updateCartCount() {
+      const count = cart.reduce((sum, item) => sum + item.qty, 0);
+      document.getElementById('cartCount').textContent = count;
+    }
+
+    function addToCart(product) {
+      const existing = cart.find(item => item.id === product.id);
+      if (existing) existing.qty += 1;
+      else cart.push({ ...product, qty: 1 });
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCartCount();
+      alert(`${product.name} adicionado!`);
+    }
+
+    const cartModal = document.getElementById('cartModal');
+    cartModal.addEventListener('show.bs.modal', () => {
+      const itemsDiv = document.getElementById('cartItems');
+      if (cart.length === 0) {
+        itemsDiv.innerHTML = '<p class="text-center">Carrinho vazio.</p>';
+        document.getElementById('cartTotal').textContent = '0.00';
+        return;
+      }
+      let total = 0;
+      itemsDiv.innerHTML = cart.map(item => {
+        const subtotal = item.price * item.qty;
+        total += subtotal;
+        return `
+          <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-secondary rounded">
+            <div><strong>${item.name}</strong><br><small>R$ ${item.price.toFixed(2)} x ${item.qty}</small></div>
+            <div>
+              <button class="btn btn-sm btn-danger" onclick="removeFromCart(${item.id})">−</button>
+              <span class="mx-2">${item.qty}</span>
+              <button class="btn btn-sm btn-success" onclick="addQty(${item.id})">+</button>
+            </div>
+          </div>`;
+      }).join('');
+      document.getElementById('cartTotal').textContent = total.toFixed(2);
+    });
+
+    window.removeFromCart = (id) => { cart = cart.filter(i => i.id !== id); localStorage.setItem('cart', JSON.stringify(cart)); updateCartCount(); bootstrap.Modal.getInstance(cartModal).show(); };
+    window.addQty = (id) => { const item = cart.find(i => i.id === id); if (item) item.qty += 1; localStorage.setItem('cart', JSON.stringify(cart)); updateCartCount(); bootstrap.Modal.getInstance(cartModal).show(); };
+
+    // FINALIZAR COMPRA
+    const checkoutModal = document.getElementById('checkoutModal');
+    checkoutModal.addEventListener('show.bs.modal', () => {
+      if (cart.length === 0) {
+        alert('Seu carrinho está vazio!');
+        bootstrap.Modal.getInstance(cartModal).show();
+        return;
+      }
+      let total = 0;
+      const itemsDiv = document.getElementById('checkoutItems');
+      itemsDiv.innerHTML = cart.map(item => {
+        const subtotal = item.price * item.qty;
+        total += subtotal;
+        return `<p><strong>${item.name}</strong> x${item.qty} = R$ ${subtotal.toFixed(2)}</p>`;
+      }).join('');
+      document.getElementById('checkoutTotal').textContent = total.toFixed(2);
+    });
+
+    document.getElementById('checkoutForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = {
+        customer: {
+          name: document.getElementById('fullName').value,
+          cpf: document.getElementById('cpf').value,
+          birthDate: document.getElementById('birthDate').value,
+          phone: document.getElementById('phone').value,
+          address: document.getElementById('address').value,
+          city: document.getElementById('city').value,
+          state: document.getElementById('state').value,
+          cep: document.getElementById('cep').value
+        },
+        items: cart,
+        total: cart.reduce((sum, i) => sum + i.price * i.qty, 0)
+      };
+      alert(`PEDIDO CONFIRMADO!\n\nNome: ${data.customer.name}\nCPF: ${data.customer.cpf}\nTotal: R$ ${data.total.toFixed(2)}\n\nEm breve enviaremos por e-mail!`);
+      cart = [];
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCartCount();
+      bootstrap.Modal.getInstance(checkoutModal).hide();
+    });
+
+    // LOGIN/CADASTRO (igual antes)
+    document.getElementById('toggleLink').addEventListener('click', (e) => { /* ... mesmo código ... */ });
+    document.getElementById('authForm').addEventListener('submit', async (e) => { /* ... mesmo código ... */ });
+
+    // CARREGAR PRODUTOS
+    async function loadProducts() {
+      const row = document.getElementById('productsRow');
+      try {
+        const res = await fetch(API_URL + '/products');
+        const products = await res.json();
+        row.innerHTML = products.map(p => `
+          <div class="col-lg-4 col-md-6">
+            <div class="card bg-dark text-white border-danger h-100">
+              <img src="${p.image_url}" class="card-img-top" style="height:250px; object-fit:cover;">
+              <div class="card-body text-center">
+                <h3 class="product-name">${p.name}</h3>
+                <p style="color:#ccc;">${p.description}</p>
+                <p class="product-price">R$ ${p.price.toFixed(2)}</p>
+                <button class="btn btn-add-cart" onclick='addToCart(${JSON.stringify(p)})'>ADICIONAR</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch {
+        row.innerHTML = '<div class="col-12 text-center text-danger">Backend offline</div>';
+      }
+    }
+
+    function scrollToProducts() { document.getElementById('productsRow').scrollIntoView({ behavior: 'smooth' }); }
+
+    loadProducts();
+    updateCartCount();
+  </script>
+</body>
+</html>
